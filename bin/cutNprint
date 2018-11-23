@@ -303,7 +303,7 @@ for arg in "${@}"; do
    log "INFO" "Image width: $imageWith. Image height: $imageHeight."
    
    resizeImage
-   ##printResult=`lp ${arg}temp.jpg`
+   printResult=`lp ${arg}temp.jpg`
    log "INFO" "$printResult"
    deleteTemporaryImage
 done
