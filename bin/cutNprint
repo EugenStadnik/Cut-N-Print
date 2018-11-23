@@ -1,0 +1,311 @@
+#!/bin/bash
+
+currentPageSize="A4"
+currentPageWith="210"
+currentPageHeight="297"
+mediaRatio="0.7070707070707071"
+
+imageWith="1050"
+imageHeight="1485"
+imageRatio="0.7070707070707071"
+
+function log {
+   echo -e `date '+%Y-%m-%d %T.%3N'` "$1" `basename $0`".${FUNCNAME[1]}" "$2" | tee -a ~/.cutNprint/application.log
+}
+
+function initializeMediaSize {
+   pageSizes=`lpoptions -l | grep PageSize`
+   pageSizesArray=( $pageSizes )
+
+   for pageSize in "${pageSizesArray[@]}"; do
+      if (echo $pageSize | grep "*" > /dev/null); then
+         currentPageSize=`echo $pageSize | sed 's/*//g'`
+      fi
+   done
+
+   case "$currentPageSize" in
+   "A4") currentPageWith="210"
+      currentPageHeight="297"
+      ;;
+   "4x6in") currentPageWith="100"
+      currentPageHeight="150"
+      ;;
+   "5x7in") currentPageWith="130"
+      currentPageHeight="180"
+      ;;
+   "Postcard") currentPageWith="105"
+      currentPageHeight="148"
+      ;;
+   "A6") currentPageWith="105"
+      currentPageHeight="148"
+      ;;
+   "A5") currentPageWith="148"
+      currentPageHeight="210"
+      ;;
+   "EnvISOB5") currentPageWith="176"
+      currentPageHeight="250"
+      ;;
+   "B5") currentPageWith="176"
+      currentPageHeight="250"
+      ;;
+   "A3") currentPageWith="297"
+      currentPageHeight="420"
+      ;;
+   "A3+") currentPageWith="329"
+      currentPageHeight="483"
+      ;;
+   "A2") currentPageWith="420"
+      currentPageHeight="594"
+      ;;
+   "B4") currentPageWith="250"
+      currentPageHeight="353"
+      ;;
+   "B3") currentPageWith="353"
+      currentPageHeight="500"
+      ;;
+   "Photo_L") currentPageWith="89"
+      currentPageHeight="127"
+      ;;
+   "3.5x5in") currentPageWith="89"
+      currentPageHeight="127"
+      ;;
+   "index5x8in") currentPageWith="127"
+      currentPageHeight="203"
+      ;;
+   "5x8in") currentPageWith="127"
+      currentPageHeight="203"
+      ;;
+   "8x10in") currentPageWith="203"
+      currentPageHeight="254"
+      ;;
+   "169widesize") currentPageWith="169"
+      currentPageHeight="239"
+      ;;
+   "100x148mm") currentPageWith="100"
+      currentPageHeight="148"
+      ;;
+   "EnvMonarch") currentPageWith="184"
+      currentPageHeight="267"
+      ;;
+   "ENVELOPEDL") currentPageWith="110"
+      currentPageHeight="219"
+      ;;
+   "EnvDL") currentPageWith="110"
+      currentPageHeight="219"
+      ;;
+   "JuniorLegal") currentPageWith="203"
+      currentPageHeight="127"
+      ;;
+   "Letter") currentPageWith="216"
+      currentPageHeight="279"
+      ;;
+   "Legal") currentPageWith="216"
+      currentPageHeight="356"
+      ;;
+   "Tabloid") currentPageWith="279"
+      currentPageHeight="432"
+      ;;
+   "Ledger") currentPageWith="279"
+      currentPageHeight="432"
+      ;;
+   "Executive") currentPageWith="184"
+      currentPageHeight="267"
+      ;;
+   "FanFoldGermanLegal") currentPageWith="216"
+      currentPageHeight="304"
+      ;;
+   "195x270mm") currentPageWith="192"
+      currentPageHeight="270"
+      ;;
+   "7.25x10.2361") currentPageWith="184"
+      currentPageHeight="260"
+      ;;
+   "7.75x10.75") currentPageWith="197"
+      currentPageHeight="273"
+      ;;
+   "DoublePostcardRotated") currentPageWith="483"
+      currentPageHeight="762"
+      ;;
+   "A7") currentPageWith="74"
+      currentPageHeight="105"
+      ;;
+   "A1") currentPageWith="594"
+      currentPageHeight="841"
+      ;;
+   "A0") currentPageWith="841"
+      currentPageHeight="1188"
+      ;;
+   "B6") currentPageWith="125"
+      currentPageHeight="176"
+      ;;
+   "B7") currentPageWith="88"
+      currentPageHeight="125"
+      ;;
+   "B8") currentPageWith="62"
+      currentPageHeight="88"
+      ;;
+   "B9") currentPageWith="44"
+      currentPageHeight="62"
+      ;;
+   "B10") currentPageWith="31"
+      currentPageHeight="44"
+      ;;
+   "B2") currentPageWith="500"
+      currentPageHeight="707"
+      ;;
+   "B1") currentPageWith="707"
+      currentPageHeight="1000"
+      ;;
+   "B0") currentPageWith="1000"
+      currentPageHeight="1414"
+      ;;
+   "C0") currentPageWith="917"
+      currentPageHeight="1297"
+      ;;
+   "C1") currentPageWith="648"
+      currentPageHeight="917"
+      ;;
+   "C2") currentPageWith="458"
+      currentPageHeight="648"
+      ;;
+   "C3") currentPageWith="324"
+      currentPageHeight="458"
+      ;;
+   "C4") currentPageWith="229"
+      currentPageHeight="324"
+      ;;
+  "ENVELOPEC5") currentPageWith="162"
+      currentPageHeight="229"
+      ;;
+   "EnvC5") currentPageWith="162"
+      currentPageHeight="229"
+      ;;
+   "C5") currentPageWith="162"
+      currentPageHeight="229"
+      ;;
+   "ENVELOPEC6") currentPageWith="114"
+      currentPageHeight="162"
+      ;;
+   "EnvC6") currentPageWith="114"
+      currentPageHeight="162"
+      ;;
+   "C6") currentPageWith="114"
+      currentPageHeight="162"
+      ;;
+   "C7") currentPageWith="81"
+      currentPageHeight="114"
+      ;;
+   "C8") currentPageWith="57"
+      currentPageHeight="81"
+      ;;
+   "C9") currentPageWith="40"
+      currentPageHeight="57"
+      ;;
+   "ENVELOPE_10") currentPageWith="28"
+      currentPageHeight="40"
+      ;;
+   "Env10") currentPageWith="28"
+      currentPageHeight="40"
+      ;;
+   "C10") currentPageWith="28"
+      currentPageHeight="40"
+      ;;
+   "ANSI_A") currentPageWith="216"
+      currentPageHeight="279"
+      ;;
+   "ANSI_B") currentPageWith="279"
+      currentPageHeight="432"
+      ;;
+   "ANSI_C") currentPageWith="432"
+      currentPageHeight="559"
+      ;;
+   "ANSI_D") currentPageWith="559"
+      currentPageHeight="864"
+      ;;
+   "ANSI_E") currentPageWith="864"
+      currentPageHeight="1118"
+      ;;
+   *)  ;;
+   esac
+
+   log "INFO" "Current printer page size is $currentPageSize such as ${currentPageWith}x${currentPageHeight}"
+   mediaRatio=`awk "BEGIN {printf \"%.16f\n\", $currentPageWith/$currentPageHeight}"`
+   log "INFO" "Current printer page ratio is $mediaRatio"
+}
+
+function resizeImage {
+   if [ $imageWith \< $imageHeight ]; then
+      log "INFO" "The image width is less than image height. So portrait is processing."
+      imageRatio=`awk "BEGIN {printf \"%.16f\n\", $imageWith/$imageHeight}"`
+      if [ $imageRatio \< $mediaRatio ]; then
+	     log "INFO" "The image ratio is $imageRatio. The media ratio is $mediaRatio."
+         log "INFO" "The image ratio is less than media ratio. So up and down cut is needed."
+         expectingHeight=`awk "BEGIN {printf \"%.0f\n\", ($imageWith*$currentPageHeight)/$currentPageWith}"`
+    	 upOffset=`awk "BEGIN {printf \"%.0f\n\", ($imageHeight-$expectingHeight)/2}"`
+	     convert -crop ${imageWith}x${expectingHeight}+0+${upOffset} $arg ${arg}temp.jpg
+      else
+	     log "INFO" "The image ratio is $imageRatio. The media ratio is $mediaRatio."
+	     log "INFO" "The image ratio grater or equals to media ratio. So left and right cut is needed."
+		 expectingWith=`awk "BEGIN {printf \"%.0f\n\", ($imageHeight*$currentPageWith)/$currentPageHeight}"`
+		 leftOffset=`awk "BEGIN {printf \"%.0f\n\", ($imageWith-$expectingWith)/2}"`
+		 convert -crop ${expectingWith}x${imageHeight}+${leftOffset}+0 $arg ${arg}temp.jpg
+      fi
+   else
+      log "INFO" "The image width is grater or equals to image height. So landscape is processing."
+	  imageRatio=`awk "BEGIN {printf \"%.16f\n\", $imageHeight/$imageWith}"`
+      if [ $imageRatio \> $mediaRatio ]; then
+	     log "INFO" "The image ratio is $imageRatio. The media ratio is $mediaRatio."
+	     log "INFO" "The image ratio grater than media ratio. So up and down cut is needed."
+		 expectingHeight=`awk "BEGIN {printf \"%.0f\n\", ($imageWith*$currentPageWith)/$currentPageHeight}"`
+		 upOffset=`awk "BEGIN {printf \"%.0f\n\", ($imageHeight-$expectingHeight)/2}"`
+		 convert -crop ${imageWith}x${expectingHeight}+0+${upOffset} $arg ${arg}temp.jpg
+      else
+	     log "INFO" "The image ratio is $imageRatio. The media ratio is $mediaRatio."
+         log "INFO" "The image ratio less than or equals to media ratio. So left and right cut is needed."
+		 expectingWith=`awk "BEGIN {printf \"%.0f\n\", ($imageHeight*$currentPageHeight)/$currentPageWith}"`
+		 leftOffset=`awk "BEGIN {printf \"%.0f\n\", ($imageWith-$expectingWith)/2}"`
+		 convert -crop ${expectingWith}x${imageHeight}+${leftOffset}+0 $arg ${arg}temp.jpg
+
+      fi
+   fi
+}
+
+function deleteTemporaryImage {
+   printerLibertieCriterie=`lpq | grep "no entries"`
+   while [ "$printerLibertieCriterie" != "no entries" ]
+   do
+      log "WARN" "Printer is NOT free. Waiting for printer to be free..."
+      sleep 20
+      printerLibertieCriterie=`lpq | grep "no entries"`
+   done
+
+   log "INFO" "Printer is free. Deleting temporary ${arg}temp.jpg image..."
+   removeResult=`rm -rfv ${arg}temp.jpg`
+   log "INFO" "$removeResult"
+}
+
+zenity --question --title="Cut'N'Print" --text="This printing application uses options defined in the current dafualt printer driver.\nCheck print options once again and either press \"Yes\" button to procide printing or \"No\" button to cancel." --width="300" --height="200"
+
+if [ "$?" == "1" ]; then
+   log "WARN" "Exited by user shoice\n"
+   exit "1"
+else
+   log "INFO" "User shoosed to procide printing and options are valid"
+fi
+
+initializeMediaSize
+
+for arg in "${@}"; do
+   echo ""
+   log "INFO" "Currently handling image: $arg"
+   imageWith=`identify -format "%w" $arg`
+   imageHeight=`identify -format "%h" $arg`
+   log "INFO" "Image width: $imageWith. Image height: $imageHeight."
+   
+   resizeImage
+   ##printResult=`lp ${arg}temp.jpg`
+   log "INFO" "$printResult"
+   deleteTemporaryImage
+done
+
+log "INFO" "All images are processed and printed. Exit.\n"
