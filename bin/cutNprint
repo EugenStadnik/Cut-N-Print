@@ -284,13 +284,13 @@ function deleteTemporaryImage {
    log "INFO" "$removeResult"
 }
 
-zenity --question --title="Cut'N'Print" --text="This printing application uses options defined in the current dafualt printer driver.\nCheck print options once again and either press \"Yes\" button to procide printing or \"No\" button to cancel." --width="300" --height="200"
+copies=`zenity --scale --title="Cut'N'Print" --text="This printing application uses options\ndefined in the current dafualt printer driver.\nCheck print options once again,\nselect copies you'd like to print\nand either press \"OK\" button to procide printing\nor \"Cancel\" button to cancel." --width="300" --height="200" --value=1`
 
-if [ "$?" == "1" ]; then
+if [ "$copies" == "" ]; then
    log "WARN" "Exited by user shoice\n"
    exit "1"
 else
-   log "INFO" "User shoosed to procide printing and options are valid"
+   log "INFO" "User shoosed to procide to print $copies copies and options are valid"
 fi
 
 initializeMediaSize
@@ -303,7 +303,7 @@ for arg in "${@}"; do
    log "INFO" "Image width: $imageWith. Image height: $imageHeight."
    
    resizeImage
-   printResult=`lp ${arg}temp.jpg`
+   printResult=`lp -n $copies ${arg}temp.jpg`
    log "INFO" "$printResult"
    deleteTemporaryImage
 done
